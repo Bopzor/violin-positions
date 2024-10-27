@@ -1,35 +1,56 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { type Note, OctaveNote, getNotes } from './getNotes';
 
-function App() {
-  const [count, setCount] = useState(0)
+const ViolonStrings = new Map<Note, [Note, OctaveNote]>([
+  ['G', ['A', '2C']],
+  ['D', ['E', '2G']],
+  ['A', ['B', '2D']],
+  ['E', ['F', '2A']],
+]);
 
+function Tonic({ note }: { note: Note }) {
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <div className="min-h-8 size-8 rounded-full border border-solid border-blue-500 flex justify-center items-center">
+      <div>{note}</div>
+    </div>
+  );
 }
 
-export default App
+function Note({ note }: { note: Note }) {
+  return (
+    <div className="min-h-8 size-8 rounded-full border border-solid border-blue-500 flex justify-center items-center">
+      <div>{note}</div>
+    </div>
+  );
+}
+
+function App() {
+  return (
+    <div className="p-10">
+      <div className="flex gap-3">
+        {[...ViolonStrings.entries()].map(([tonic, notes]) => (
+          <div className="flex flex-col" key={tonic}>
+            <div className="flex flex-col items-center h-12">
+              <Tonic note={tonic} />
+              <div className="h-full w-0.5 bg-black mt-2" />
+            </div>
+
+            {getNotes(notes).map((note, index) => (
+              <div
+                className={`flex flex-col items-center h-12 ${
+                  index === 0 || index < 4 ? 'bg-red-300/50 bg-clip-border' : ''
+                }`}
+                key={`${tonic}-${index}`}
+              >
+                <div className="h-full w-0.5 bg-black" />
+                <Note note={note} />
+                <div className="h-full w-0.5 bg-black" />
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export default App;
