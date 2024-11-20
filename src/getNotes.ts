@@ -35,3 +35,16 @@ export function getNextNote(note: Note): Note {
 
   return NOTES[noteIndex + 1];
 }
+
+const FRENCH_NOTES = ['Do', 'Ré', 'Mi', 'Fa', 'Sol', 'La', 'Si'] as const;
+type FrenchNote = (typeof FRENCH_NOTES)[number];
+
+export const noteToFrench: Record<Note, FrenchNote> = {
+  A: 'La',
+  B: 'Si',
+  C: 'Do',
+  D: 'Ré',
+  E: 'Mi',
+  F: 'Fa',
+  G: 'Sol',
+};
