@@ -2,7 +2,7 @@ const NOTES = ['A', 'B', 'C', 'D', 'E', 'F', 'G'] as const;
 export type Note = (typeof NOTES)[number];
 export type OctaveNote = `${number}${Note}`;
 
-function isNote(note: Note | OctaveNote): note is Note {
+export function isNote(note: Note | OctaveNote): note is Note {
   return NOTES.includes(note as Note);
 }
 
@@ -24,6 +24,26 @@ export function getNotes([first, last]: [Note, Note | OctaveNote]): Note[] {
   }
 
   return notes;
+}
+
+export function getNotesWithOctave([first, last]: [Note, Note | OctaveNote]): (
+  | Note
+  | OctaveNote
+)[] {
+  const notes = getNotes([first, last]);
+  let octave = 0;
+
+  return notes.map((note) => {
+    if (note === first) {
+      octave += 1;
+    }
+
+    if (octave > 1) {
+      return `${octave}${note}` as OctaveNote;
+    }
+
+    return note;
+  });
 }
 
 export function getNextNote(note: Note): Note {
@@ -48,3 +68,16 @@ export const noteToFrench: Record<Note, FrenchNote> = {
   F: 'Fa',
   G: 'Sol',
 };
+
+export function getSemitoneCountFromTonic(tonic: Note, note: Note | OctaveNote): number {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_, ...notes] = getNotes([tonic, note]);
+
+  return notes.reduce((semitones, note) => {
+    if (['C', 'F'].includes(note)) {
+      return (semitones += 1);
+    }
+
+    return (semitones += 2);
+  }, 0);
+}

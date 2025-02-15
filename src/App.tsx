@@ -1,11 +1,18 @@
 import React, { useState } from 'react';
-import { type Note, OctaveNote, getNotes, noteToFrench } from './getNotes';
+import {
+  type Note,
+  OctaveNote,
+  getNotesWithOctave,
+  getSemitoneCountFromTonic,
+  isNote,
+  noteToFrench,
+} from './getNotes';
 
-const VIOLON_STRINGS = new Map<Note, [Note, OctaveNote]>([
-  ['G', ['A', '2C']],
-  ['D', ['E', '2G']],
-  ['A', ['B', '2D']],
-  ['E', ['F', '2A']],
+const VIOLON_STRINGS = new Set<[Note, OctaveNote]>([
+  ['G', '2C'],
+  ['D', '2G'],
+  ['A', '2D'],
+  ['E', '2A'],
 ]);
 
 const POSITIONS = [
@@ -20,8 +27,9 @@ const POSITIONS = [
 
 function App() {
   const stringSpacing = 50;
-  const noteSpacing = 60;
+  const noteSpacing = 80;
   const noteRadius = 20;
+  const firstNoteOffset = noteRadius * 3;
   const startStringOffset = 125;
 
   const [selectedPositions, setSelectedPosition] = useState<(typeof POSITIONS)[number][]>([]);
@@ -83,7 +91,7 @@ function App() {
         </label>
       </div>
 
-      <svg version="1.1" viewBox="0 0 500 700" xmlns="http://www.w3.org/2000/svg">
+      <svg version="1.1" viewBox="0 0 500 800" xmlns="http://www.w3.org/2000/svg">
         {selectedPositions.map(({ number, color }, positionIndex) => (
           <React.Fragment key={`position-${number}`}>
             <rect
@@ -142,59 +150,72 @@ function App() {
           </React.Fragment>
         ))}
 
-        {[...VIOLON_STRINGS.entries()].map(([tonic, notes], tonicIndex) => (
-          <React.Fragment key={tonic}>
-            <circle
-              cx={(tonicIndex + 1) * stringSpacing + startStringOffset}
-              cy={stringSpacing}
-              r="20"
-              fill="transparent"
-              stroke="blue"
-              strokeWidth="1"
-            />
-            <text
-              x={(tonicIndex + 1) * stringSpacing + startStringOffset}
-              y="58"
-              fontSize="22"
-              textAnchor="middle"
-              fill="black"
-            >
-              {toFrench ? noteToFrench[tonic] : tonic}
-            </text>
+        {[...VIOLON_STRINGS.values()].map((notes, tonicIndex) => {
+          const [tonic, ...notesWithOctave] = getNotesWithOctave(notes);
 
-            <line
-              x1={(tonicIndex + 1) * stringSpacing + startStringOffset}
-              y1="80"
-              x2={(tonicIndex + 1) * stringSpacing + startStringOffset}
-              y2="800"
-              stroke="black"
-              strokeWidth="2"
-            />
+          if (!isNote(tonic)) {
+            throw new Error(`the tonic ${tonic} contains an octave`);
+          }
 
-            {getNotes(notes).map((note, noteIndex) => (
-              <React.Fragment key={`${tonic}-${noteIndex}`}>
-                <circle
-                  cx={(tonicIndex + 1) * stringSpacing + startStringOffset}
-                  cy={(noteIndex + 2) * noteSpacing}
-                  r="20"
-                  fill="white"
-                  stroke="blue"
-                  strokeWidth="1"
-                />
+          return (
+            <React.Fragment key={tonic}>
+              <circle
+                cx={(tonicIndex + 1) * stringSpacing + startStringOffset}
+                cy={stringSpacing}
+                r="20"
+                fill="transparent"
+                stroke="blue"
+                strokeWidth="1"
+              />
+              <text
+                x={(tonicIndex + 1) * stringSpacing + startStringOffset}
+                y="58"
+                fontSize="22"
+                textAnchor="middle"
+                fill="black"
+              >
+                {toFrench ? noteToFrench[tonic] : tonic}
+              </text>
 
-                <text
-                  x={(tonicIndex + 1) * stringSpacing + startStringOffset}
-                  y={(noteIndex + 2) * noteSpacing + 8}
-                  fontSize="22"
-                  textAnchor="middle"
-                  fill="black"
-                >
-                  {toFrench ? noteToFrench[note] : note}
-                </text>
-              </React.Fragment>
-            ))}
-          </React.Fragment>
-        ))}
+              <line
+                x1={(tonicIndex + 1) * stringSpacing + startStringOffset}
+                y1="80"
+                x2={(tonicIndex + 1) * stringSpacing + startStringOffset}
+                y2="800"
+                stroke="black"
+                strokeWidth="2"
+              />
+
+              {notesWithOctave.map((note, noteIndex) => {
+                const noteWithoutOctave: Note = isNote(note) ? note : (note[1] as Note);
+                const tonesFromTonic = getSemitoneCountFromTonic(tonic, note) / 2;
+
+                return (
+                  <React.Fragment key={`${tonic}-${noteIndex}`}>
+                    <circle
+                      cx={(tonicIndex + 1) * stringSpacing + startStringOffset}
+                      cy={tonesFromTonic * noteSpacing + firstNoteOffset}
+                      r="20"
+                      fill="white"
+                      stroke="blue"
+                      strokeWidth="1"
+                    />
+
+                    <text
+                      x={(tonicIndex + 1) * stringSpacing + startStringOffset}
+                      y={tonesFromTonic * noteSpacing + firstNoteOffset + 8}
+                      fontSize="22"
+                      textAnchor="middle"
+                      fill="black"
+                    >
+                      {toFrench ? noteToFrench[noteWithoutOctave] : noteWithoutOctave}
+                    </text>
+                  </React.Fragment>
+                );
+              })}
+            </React.Fragment>
+          );
+        })}
       </svg>
     </div>
   );
