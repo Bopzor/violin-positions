@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   type Note,
   OctaveNote,
@@ -7,92 +7,8 @@ import {
   getToneCountFromTonic,
   isNote,
   noteToFrench,
-  tonesFromSemitones,
 } from './getNotes';
-
-const VIOLON_STRINGS = new Set<[Note, OctaveNote]>([
-  ['G', '2C'],
-  ['D', '2G'],
-  ['A', '2D'],
-  ['E', '2A'],
-]);
-
-const POSITIONS: {
-  number: number;
-  color: string;
-  strings: { [tonic in Note]?: (Note | OctaveNote)[] };
-}[] = [
-  {
-    number: 1,
-    color: '#f94144',
-    strings: {
-      G: ['A', 'B', 'C', 'D'],
-      D: ['E', 'F', 'G', 'A'],
-      A: ['B', 'C', 'D', 'E'],
-      E: ['F', 'G', 'A', 'B'],
-    },
-  },
-  {
-    number: 2,
-    color: '#f3722c',
-    strings: {
-      G: ['B', 'C', 'D', 'E'],
-      D: ['F', 'G', 'A', 'B'],
-      A: ['C', 'D', 'E', 'F'],
-      E: ['G', 'A', 'B', 'C'],
-    },
-  },
-  {
-    number: 3,
-    color: '#f8961e',
-    strings: {
-      G: ['C', 'D', 'E', 'F'],
-      D: ['G', 'A', 'B', 'C'],
-      A: ['D', 'E', 'F', 'G'],
-      E: ['A', 'B', 'C', 'D'],
-    },
-  },
-  {
-    number: 4,
-    color: '#f9c74f',
-    strings: {
-      G: ['D', 'E', 'F', '2G'],
-      D: ['A', 'B', 'C', '2D'],
-      A: ['E', 'F', 'G', '2A'],
-      E: ['B', 'C', 'D', '2E'],
-    },
-  },
-  {
-    number: 5,
-    color: '#90be6d',
-    strings: {
-      G: ['E', 'F', '2G', '2A'],
-      D: ['B', 'C', '2D', '2E'],
-      A: ['F', 'G', '2A', '2B'],
-      E: ['C', 'D', '2E', '2F'],
-    },
-  },
-  {
-    number: 6,
-    color: '#43aa8b',
-    strings: {
-      G: ['F', '2G', '2A', '2B'],
-      D: ['C', '2D', '2E', '2F'],
-      A: ['G', '2A', '2B', '2C'],
-      E: ['D', '2E', '2F', '2G'],
-    },
-  },
-  {
-    number: 7,
-    color: '#577590',
-    strings: {
-      G: ['2G', '2A', '2B', '2C'],
-      D: ['2D', '2E', '2F', '2G'],
-      A: ['2A', '2B', '2C', '2D'],
-      E: ['2E', '2F', '2G', '2A'],
-    },
-  },
-];
+import { POSITIONS, VIOLON_STRINGS } from './violin.model';
 
 function App() {
   const stringSpacing = 50;
@@ -102,6 +18,7 @@ function App() {
   const startStringOffset = 125;
 
   const [selectedPositions, setSelectedPosition] = useState<(typeof POSITIONS)[number][]>([]);
+  const [selectedString, setSelectedString] = useState<Note | undefined>();
   const [toFrench, setToFrench] = useState(false);
 
   const togglePosition = (position: number) => {
@@ -124,6 +41,12 @@ function App() {
   const onCheck = (event: React.ChangeEvent<HTMLInputElement>) => {
     setToFrench(event.target.checked);
   };
+
+  useEffect(() => {
+    if (selectedPositions.length === 0) {
+      setSelectedString(undefined);
+    }
+  }, [selectedPositions]);
 
   return (
     <div className="p-4 flex flex-col gap-4 h-screen w-screen">
@@ -169,14 +92,15 @@ function App() {
           const [minSemitonesFromTonic, maxSemitonesFromTonic] =
             getMinMaxTonesCountFromTonics(strings);
 
-          const baseKeyString =
-            positionIndex % 2 === 0
-              ? (Object.keys(strings)[0] as Note)
-              : (Object.keys(strings)[Object.keys(strings).length - 1] as Note);
+          const baseKeyString = selectedString
+            ? selectedString
+            : positionIndex % 2 === 0
+            ? (Object.keys(strings)[0] as Note)
+            : (Object.keys(strings)[Object.keys(strings).length - 1] as Note);
           const baseStringNotes = strings[baseKeyString] as (Note | OctaveNote)[];
 
           return (
-            <React.Fragment key={`position-${number}`}>
+            <g id={`position-${number}`} key={`position-${number}`}>
               <rect
                 x={
                   positionIndex % 2 === 0
@@ -199,14 +123,11 @@ function App() {
                 const tonesFromTonic = getToneCountFromTonic(baseKeyString, note);
 
                 return (
-                  <React.Fragment key={`finger-${finger}`}>
+                  <g id={`${finger}-finger-position-${number}`} key={`finger-${finger}`}>
                     <circle
                       cx={
                         positionIndex % 2 === 0
-                          ? 15 +
-                            startStringOffset -
-                            POSITIONS.length * 15 +
-                            15 * positionIndex
+                          ? 15 + startStringOffset - POSITIONS.length * 15 + 15 * positionIndex
                           : stringSpacing * 4 +
                             noteRadius * 2 -
                             5 +
@@ -223,10 +144,7 @@ function App() {
                     <text
                       x={
                         positionIndex % 2 === 0
-                          ? 15 +
-                            startStringOffset -
-                            POSITIONS.length * 15 +
-                            15 * positionIndex
+                          ? 15 + startStringOffset - POSITIONS.length * 15 + 15 * positionIndex
                           : stringSpacing * 4 +
                             noteRadius * 2 -
                             5 +
@@ -241,10 +159,10 @@ function App() {
                     >
                       {finger}
                     </text>
-                  </React.Fragment>
+                  </g>
                 );
               })}
-            </React.Fragment>
+            </g>
           );
         })}
 
@@ -256,24 +174,30 @@ function App() {
           }
 
           return (
-            <React.Fragment key={tonic}>
-              <circle
-                cx={(tonicIndex + 1) * stringSpacing + startStringOffset}
-                cy={stringSpacing}
-                r="20"
-                fill="transparent"
-                stroke="blue"
-                strokeWidth="1"
-              />
-              <text
-                x={(tonicIndex + 1) * stringSpacing + startStringOffset}
-                y="58"
-                fontSize="22"
-                textAnchor="middle"
-                fill="black"
+            <g id={`${tonic}-string`} key={tonic}>
+              <g
+                id={`${tonic}-base-note`}
+                onClick={() => setSelectedString(tonic)}
+                className="cursor-pointer"
               >
-                {toFrench ? noteToFrench[tonic] : tonic}
-              </text>
+                <circle
+                  cx={(tonicIndex + 1) * stringSpacing + startStringOffset}
+                  cy={stringSpacing}
+                  r="20"
+                  fill="transparent"
+                  stroke="blue"
+                  strokeWidth="1"
+                />
+                <text
+                  x={(tonicIndex + 1) * stringSpacing + startStringOffset}
+                  y="58"
+                  fontSize="22"
+                  textAnchor="middle"
+                  fill="black"
+                >
+                  {toFrench ? noteToFrench[tonic] : tonic}
+                </text>
+              </g>
 
               <line
                 x1={(tonicIndex + 1) * stringSpacing + startStringOffset}
@@ -289,7 +213,7 @@ function App() {
                 const tonesFromTonic = getToneCountFromTonic(tonic, note);
 
                 return (
-                  <React.Fragment key={`${tonic}-${noteIndex}`}>
+                  <g id={`${note}-note-${tonic}-string`} key={`${tonic}-${noteIndex}`}>
                     <circle
                       cx={(tonicIndex + 1) * stringSpacing + startStringOffset}
                       cy={tonesFromTonic * noteSpacing + firstNoteOffset}
@@ -308,10 +232,10 @@ function App() {
                     >
                       {toFrench ? noteToFrench[noteWithoutOctave] : noteWithoutOctave}
                     </text>
-                  </React.Fragment>
+                  </g>
                 );
               })}
-            </React.Fragment>
+            </g>
           );
         })}
       </svg>
