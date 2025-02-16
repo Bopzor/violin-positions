@@ -69,15 +69,40 @@ export const noteToFrench: Record<Note, FrenchNote> = {
   G: 'Sol',
 };
 
-export function getSemitoneCountFromTonic(tonic: Note, note: Note | OctaveNote): number {
+export function getToneCountFromTonic(tonic: Note, note: Note | OctaveNote): number {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [_, ...notes] = getNotes([tonic, note]);
 
-  return notes.reduce((semitones, note) => {
-    if (['C', 'F'].includes(note)) {
-      return (semitones += 1);
-    }
+  return (
+    notes.reduce((semitones, note) => {
+      if (['C', 'F'].includes(note)) {
+        return (semitones += 1);
+      }
 
-    return (semitones += 2);
-  }, 0);
+      return (semitones += 2);
+    }, 0) / 2
+  );
+}
+
+export function getMinMaxTonesCountFromTonics(notes: {
+  [tonic in Note]?: (Note | OctaveNote)[];
+}): [number, number] {
+  let minSemitones = 0;
+  let maxSemitones = 0;
+
+  for (const [tonic, composingNotes] of Object.entries(notes)) {
+    for (const note of composingNotes) {
+      const semitones = getToneCountFromTonic(tonic as Note, note);
+
+      if (minSemitones === 0 || semitones < minSemitones) {
+        minSemitones = semitones;
+      }
+
+      if (maxSemitones === 0 || semitones > maxSemitones) {
+        maxSemitones = semitones;
+      }
+    }
+  }
+
+  return [minSemitones, maxSemitones];
 }
