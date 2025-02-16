@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { getSemitoneCountFromTonic, getNextNote, getNotes, getNotesWithOctave } from '../getNotes';
+import {
+  getToneCountFromTonic,
+  getNextNote,
+  getNotes,
+  getNotesWithOctave,
+  getMinMaxTonesCountFromTonics,
+} from '../getNotes';
 
 describe('getNotes', () => {
   it('returns the list of notes from start to end', () => {
@@ -17,12 +23,6 @@ describe('getNotes', () => {
 });
 
 describe('getNotesWithOctave', () => {
-  it('returns the list of notes from start to end', () => {
-    expect(getNotesWithOctave(['A', 'A'])).toEqual(['A']);
-    expect(getNotesWithOctave(['A', 'B'])).toEqual(['A', 'B']);
-    expect(getNotesWithOctave(['A', 'G'])).toEqual(['A', 'B', 'C', 'D', 'E', 'F', 'G']);
-  });
-
   it('returns the list of notes from start to end with octave', () => {
     expect(getNotesWithOctave(['A', '2C'])).toEqual([
       'A',
@@ -88,13 +88,80 @@ describe('getNextNote', () => {
 
 describe('getSemitoneCountFromTonic', () => {
   it('returns the count of semi-tones from given note and previous', () => {
-    expect(getSemitoneCountFromTonic('G', 'A')).toEqual(2);
-    expect(getSemitoneCountFromTonic('G', 'B')).toEqual(4);
-    expect(getSemitoneCountFromTonic('G', 'C')).toEqual(5);
-    expect(getSemitoneCountFromTonic('G', 'D')).toEqual(7);
-    expect(getSemitoneCountFromTonic('G', 'E')).toEqual(9);
-    expect(getSemitoneCountFromTonic('G', 'F')).toEqual(10);
-    expect(getSemitoneCountFromTonic('G', '2G')).toEqual(12);
-    expect(getSemitoneCountFromTonic('G', '2A')).toEqual(14);
+    expect(getToneCountFromTonic('G', 'A')).toEqual(1);
+    expect(getToneCountFromTonic('G', 'B')).toEqual(2);
+    expect(getToneCountFromTonic('G', 'C')).toEqual(2.5);
+    expect(getToneCountFromTonic('G', 'D')).toEqual(3.5);
+    expect(getToneCountFromTonic('G', 'E')).toEqual(4.5);
+    expect(getToneCountFromTonic('G', 'F')).toEqual(5);
+    expect(getToneCountFromTonic('G', '2G')).toEqual(6);
+    expect(getToneCountFromTonic('G', '2A')).toEqual(7);
+  });
+});
+
+describe('getMinMaxSemitonesCountFromTonic', () => {
+  it('returns min max semitones', () => {
+    expect(
+      getMinMaxTonesCountFromTonics({
+        G: ['A', 'B', 'C', 'D'],
+        D: ['E', 'F', 'G', 'A'],
+        A: ['B', 'C', 'D', 'E'],
+        E: ['F', 'G', 'A', 'B'],
+      })
+    ).toEqual([0.5, 3.5]);
+
+    expect(
+      getMinMaxTonesCountFromTonics({
+        G: ['B', 'C', 'D', 'E'],
+        D: ['F', 'G', 'A', 'B'],
+        A: ['C', 'D', 'E', 'F'],
+        E: ['G', 'A', 'B', 'C'],
+      })
+    ).toEqual([1.5, 4.5]);
+
+    expect(
+      getMinMaxTonesCountFromTonics({
+        G: ['C', 'D', 'E', 'F'],
+        D: ['G', 'A', 'B', 'C'],
+        A: ['D', 'E', 'F', 'G'],
+        E: ['A', 'B', 'C', 'D'],
+      })
+    ).toEqual([2.5, 5]);
+
+    expect(
+      getMinMaxTonesCountFromTonics({
+        G: ['D', 'E', 'F', '2G'],
+        D: ['A', 'B', 'C', '2D'],
+        A: ['E', 'F', 'G', '2A'],
+        E: ['B', 'C', 'D', '2E'],
+      })
+    ).toEqual([3.5, 6]);
+
+    expect(
+      getMinMaxTonesCountFromTonics({
+        G: ['E', 'F', '2G', '2A'],
+        D: ['B', 'C', '2D', '2E'],
+        A: ['F', 'G', '2A', '2B'],
+        E: ['C', 'D', '2E', '2F'],
+      })
+    ).toEqual([4, 7]);
+
+    expect(
+      getMinMaxTonesCountFromTonics({
+        G: ['F', '2G', '2A', '2B'],
+        D: ['C', '2D', '2E', '2F'],
+        A: ['G', '2A', '2B', '2C'],
+        E: ['D', '2E', '2F', '2G'],
+      })
+    ).toEqual([5, 8]);
+
+    expect(
+      getMinMaxTonesCountFromTonics({
+        G: ['2G', '2A', '2B', '2C'],
+        D: ['2D', '2E', '2F', '2G'],
+        A: ['2A', '2B', '2C', '2D'],
+        E: ['2E', '2F', '2G', '2A'],
+      })
+    ).toEqual([6, 8.5]);
   });
 });

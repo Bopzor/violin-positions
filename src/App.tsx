@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import {
   type Note,
   OctaveNote,
+  getMinMaxTonesCountFromTonics,
   getNotesWithOctave,
-  getSemitoneCountFromTonic,
+  getToneCountFromTonic,
   isNote,
   noteToFrench,
+  tonesFromSemitones,
 } from './getNotes';
 
 const VIOLON_STRINGS = new Set<[Note, OctaveNote]>([
@@ -15,14 +17,81 @@ const VIOLON_STRINGS = new Set<[Note, OctaveNote]>([
   ['E', '2A'],
 ]);
 
-const POSITIONS = [
-  { number: 1, color: '#f94144' },
-  { number: 2, color: '#f3722c' },
-  { number: 3, color: '#f8961e' },
-  { number: 4, color: '#f9c74f' },
-  { number: 5, color: '#90be6d' },
-  { number: 6, color: '#43aa8b' },
-  { number: 7, color: '#577590' },
+const POSITIONS: {
+  number: number;
+  color: string;
+  strings: { [tonic in Note]?: (Note | OctaveNote)[] };
+}[] = [
+  {
+    number: 1,
+    color: '#f94144',
+    strings: {
+      G: ['A', 'B', 'C', 'D'],
+      D: ['E', 'F', 'G', 'A'],
+      A: ['B', 'C', 'D', 'E'],
+      E: ['F', 'G', 'A', 'B'],
+    },
+  },
+  {
+    number: 2,
+    color: '#f3722c',
+    strings: {
+      G: ['B', 'C', 'D', 'E'],
+      D: ['F', 'G', 'A', 'B'],
+      A: ['C', 'D', 'E', 'F'],
+      E: ['G', 'A', 'B', 'C'],
+    },
+  },
+  {
+    number: 3,
+    color: '#f8961e',
+    strings: {
+      G: ['C', 'D', 'E', 'F'],
+      D: ['G', 'A', 'B', 'C'],
+      A: ['D', 'E', 'F', 'G'],
+      E: ['A', 'B', 'C', 'D'],
+    },
+  },
+  {
+    number: 4,
+    color: '#f9c74f',
+    strings: {
+      G: ['D', 'E', 'F', '2G'],
+      D: ['A', 'B', 'C', '2D'],
+      A: ['E', 'F', 'G', '2A'],
+      E: ['B', 'C', 'D', '2E'],
+    },
+  },
+  {
+    number: 5,
+    color: '#90be6d',
+    strings: {
+      G: ['E', 'F', '2G', '2A'],
+      D: ['B', 'C', '2D', '2E'],
+      A: ['F', 'G', '2A', '2B'],
+      E: ['C', 'D', '2E', '2F'],
+    },
+  },
+  {
+    number: 6,
+    color: '#43aa8b',
+    strings: {
+      G: ['F', '2G', '2A', '2B'],
+      D: ['C', '2D', '2E', '2F'],
+      A: ['G', '2A', '2B', '2C'],
+      E: ['D', '2E', '2F', '2G'],
+    },
+  },
+  {
+    number: 7,
+    color: '#577590',
+    strings: {
+      G: ['2G', '2A', '2B', '2C'],
+      D: ['2D', '2E', '2F', '2G'],
+      A: ['2A', '2B', '2C', '2D'],
+      E: ['2E', '2F', '2G', '2A'],
+    },
+  },
 ];
 
 function App() {
@@ -92,63 +161,92 @@ function App() {
       </div>
 
       <svg version="1.1" viewBox="0 0 500 800" xmlns="http://www.w3.org/2000/svg">
-        {selectedPositions.map(({ number, color }, positionIndex) => (
-          <React.Fragment key={`position-${number}`}>
-            <rect
-              x={
-                positionIndex % 2 === 0
-                  ? startStringOffset - selectedPositions.length * 15 + 15 * positionIndex
-                  : stringSpacing + startStringOffset
-              }
-              y={number * noteSpacing + noteSpacing / 2}
-              width={stringSpacing * 4 + (selectedPositions.length * 15 - 15 * positionIndex)}
-              height={60 * 4}
-              stroke={color}
-              strokeWidth="1"
-              fill={color}
-              fillOpacity="0.1"
-            />
-            {[1, 2, 3, 4].map((finger, index) => (
-              <React.Fragment key={`finger-${finger}`}>
-                <circle
-                  cx={
-                    positionIndex % 2 === 0
-                      ? 15 + startStringOffset - selectedPositions.length * 15 + 15 * positionIndex
-                      : stringSpacing * 4 +
-                        noteRadius * 2 -
-                        5 +
-                        startStringOffset +
-                        selectedPositions.length * 15 -
-                        15 * positionIndex
-                  }
-                  cy={(index + 2) * noteSpacing + noteSpacing * (number - 1)}
-                  r="10"
-                  fill={color}
-                  stroke={color}
-                  strokeWidth="1"
-                />
-                <text
-                  x={
-                    positionIndex % 2 === 0
-                      ? 15 + startStringOffset - selectedPositions.length * 15 + 15 * positionIndex
-                      : stringSpacing * 4 +
-                        noteRadius * 2 -
-                        5 +
-                        startStringOffset +
-                        selectedPositions.length * 15 -
-                        15 * positionIndex
-                  }
-                  y={(index + 2) * noteSpacing + 5 + noteSpacing * (number - 1)}
-                  fontSize="14"
-                  textAnchor="middle"
-                  fill="white"
-                >
-                  {finger}
-                </text>
-              </React.Fragment>
-            ))}
-          </React.Fragment>
-        ))}
+        {POSITIONS.map(({ number, color, strings }, positionIndex) => {
+          if (!selectedPositions.find((position) => number === position.number)) {
+            return null;
+          }
+
+          const [minSemitonesFromTonic, maxSemitonesFromTonic] =
+            getMinMaxTonesCountFromTonics(strings);
+
+          const baseKeyString =
+            positionIndex % 2 === 0
+              ? (Object.keys(strings)[0] as Note)
+              : (Object.keys(strings)[Object.keys(strings).length - 1] as Note);
+          const baseStringNotes = strings[baseKeyString] as (Note | OctaveNote)[];
+
+          return (
+            <React.Fragment key={`position-${number}`}>
+              <rect
+                x={
+                  positionIndex % 2 === 0
+                    ? startStringOffset - POSITIONS.length * 15 + 15 * positionIndex
+                    : stringSpacing + startStringOffset
+                }
+                y={minSemitonesFromTonic * noteSpacing + (firstNoteOffset - noteRadius)}
+                width={stringSpacing * 4 + (POSITIONS.length * 15 - 15 * positionIndex)}
+                height={
+                  (maxSemitonesFromTonic - minSemitonesFromTonic) * noteSpacing +
+                  (firstNoteOffset - noteRadius)
+                }
+                stroke={color}
+                strokeWidth="1"
+                fill={color}
+                fillOpacity="0.1"
+              />
+              {baseStringNotes.map((note, index) => {
+                const finger = index + 1;
+                const tonesFromTonic = getToneCountFromTonic(baseKeyString, note);
+
+                return (
+                  <React.Fragment key={`finger-${finger}`}>
+                    <circle
+                      cx={
+                        positionIndex % 2 === 0
+                          ? 15 +
+                            startStringOffset -
+                            POSITIONS.length * 15 +
+                            15 * positionIndex
+                          : stringSpacing * 4 +
+                            noteRadius * 2 -
+                            5 +
+                            startStringOffset +
+                            POSITIONS.length * 15 -
+                            15 * positionIndex
+                      }
+                      cy={tonesFromTonic * noteSpacing + firstNoteOffset}
+                      r="10"
+                      fill={color}
+                      stroke={color}
+                      strokeWidth="1"
+                    />
+                    <text
+                      x={
+                        positionIndex % 2 === 0
+                          ? 15 +
+                            startStringOffset -
+                            POSITIONS.length * 15 +
+                            15 * positionIndex
+                          : stringSpacing * 4 +
+                            noteRadius * 2 -
+                            5 +
+                            startStringOffset +
+                            POSITIONS.length * 15 -
+                            15 * positionIndex
+                      }
+                      y={tonesFromTonic * noteSpacing + firstNoteOffset + 5}
+                      fontSize="14"
+                      textAnchor="middle"
+                      fill="white"
+                    >
+                      {finger}
+                    </text>
+                  </React.Fragment>
+                );
+              })}
+            </React.Fragment>
+          );
+        })}
 
         {[...VIOLON_STRINGS.values()].map((notes, tonicIndex) => {
           const [tonic, ...notesWithOctave] = getNotesWithOctave(notes);
@@ -188,7 +286,7 @@ function App() {
 
               {notesWithOctave.map((note, noteIndex) => {
                 const noteWithoutOctave: Note = isNote(note) ? note : (note[1] as Note);
-                const tonesFromTonic = getSemitoneCountFromTonic(tonic, note) / 2;
+                const tonesFromTonic = getToneCountFromTonic(tonic, note);
 
                 return (
                   <React.Fragment key={`${tonic}-${noteIndex}`}>
