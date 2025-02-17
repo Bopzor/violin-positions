@@ -5,6 +5,7 @@ import { type Note } from './getNotes';
 import { Positions } from './Positions';
 import { Strings } from './Strings';
 import { POSITIONS, VIOLON_STRINGS } from './violin.model';
+import { Violin } from './Violin';
 
 function App() {
   const [selectedPositions, setSelectedPosition] = useState<(typeof POSITIONS)[number][]>([]);
@@ -44,6 +45,8 @@ function App() {
       />
 
       <svg version="1.1" viewBox="0 0 500 800" xmlns="http://www.w3.org/2000/svg">
+        <Violin />
+
         <Positions
           positions={POSITIONS}
           selectedPositions={selectedPositions}

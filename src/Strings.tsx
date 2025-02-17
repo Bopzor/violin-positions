@@ -40,8 +40,8 @@ export function Strings({ strings, isFrench, onSelectString }: StringsProps) {
                 cx={(tonicIndex + 1) * STRING_SPACING + START_STRING_OFFSET}
                 cy={STRING_SPACING}
                 r="20"
-                fill="transparent"
-                stroke="blue"
+                fill="white"
+                stroke="black"
                 strokeWidth="1"
               />
               <text
@@ -75,7 +75,7 @@ export function Strings({ strings, isFrench, onSelectString }: StringsProps) {
                     cy={tonesFromTonic * NOTE_SPACING + FIRST_NOTE_OFFSET}
                     r="20"
                     fill="white"
-                    stroke="blue"
+                    stroke="black"
                     strokeWidth="1"
                   />
 
