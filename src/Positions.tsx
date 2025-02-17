@@ -37,11 +37,13 @@ export function Positions({ positions, selectedPositions, selectedString }: Posi
             <rect
               x={
                 positionIndex % 2 === 0
-                  ? START_STRING_OFFSET - positions.length * 15 + 15 * positionIndex
+                  ? START_STRING_OFFSET - positions.length * 15 + 15 * (positions.length - number)
                   : STRING_SPACING + START_STRING_OFFSET
               }
               y={minSemitonesFromTonic * NOTE_SPACING + (FIRST_NOTE_OFFSET - NOTE_RADIUS)}
-              width={STRING_SPACING * 4 + (positions.length * 15 - 15 * positionIndex)}
+              width={
+                STRING_SPACING * 4 + (positions.length * 15 - 15 * (positions.length - number))
+              }
               height={
                 (maxSemitonesFromTonic - minSemitonesFromTonic) * NOTE_SPACING +
                 (FIRST_NOTE_OFFSET - NOTE_RADIUS)
@@ -60,13 +62,16 @@ export function Positions({ positions, selectedPositions, selectedString }: Posi
                   <circle
                     cx={
                       positionIndex % 2 === 0
-                        ? 15 + START_STRING_OFFSET - positions.length * 15 + 15 * positionIndex
+                        ? 15 +
+                          START_STRING_OFFSET -
+                          positions.length * 15 +
+                          15 * (positions.length - number)
                         : STRING_SPACING * 4 +
                           NOTE_RADIUS * 2 -
                           5 +
                           START_STRING_OFFSET +
                           positions.length * 15 -
-                          15 * positionIndex
+                          15 * (positions.length - number)
                     }
                     cy={tonesFromTonic * NOTE_SPACING + FIRST_NOTE_OFFSET}
                     r="10"
@@ -77,13 +82,16 @@ export function Positions({ positions, selectedPositions, selectedString }: Posi
                   <text
                     x={
                       positionIndex % 2 === 0
-                        ? 15 + START_STRING_OFFSET - positions.length * 15 + 15 * positionIndex
+                        ? 15 +
+                          START_STRING_OFFSET -
+                          positions.length * 15 +
+                          15 * (positions.length - number)
                         : STRING_SPACING * 4 +
                           NOTE_RADIUS * 2 -
                           5 +
                           START_STRING_OFFSET +
                           positions.length * 15 -
-                          15 * positionIndex
+                          15 * (positions.length - number)
                     }
                     y={tonesFromTonic * NOTE_SPACING + FIRST_NOTE_OFFSET + 5}
                     fontSize="14"
