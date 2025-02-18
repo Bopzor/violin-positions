@@ -1,85 +1,85 @@
-import { Note, OctaveNote } from './getNotes';
+import { OctaveNote } from './getNotes';
 
-export const VIOLON_STRINGS = new Set<[Note, OctaveNote]>([
-  ['G', '2C'],
-  ['D', '2G'],
-  ['A', '2D'],
-  ['E', '2A'],
+export const VIOLON_STRINGS = new Set<[OctaveNote, OctaveNote]>([
+  ['0G', '2C'],
+  ['1D', '3G'],
+  ['2A', '3D'],
+  ['2E', '4A'],
 ]);
 
 export const POSITIONS: {
   number: number;
   color: string;
-  strings: { [tonic in Note]?: (Note | OctaveNote)[] };
+  strings: { [tonic in OctaveNote]?: OctaveNote[] };
 }[] = [
   {
     number: 1,
     color: '#f94144',
     strings: {
-      G: ['A', 'B', 'C', 'D'],
-      D: ['E', 'F', 'G', 'A'],
-      A: ['B', 'C', 'D', 'E'],
-      E: ['F', 'G', 'A', 'B'],
+      '0G': ['1A', '1B', '1C', '1D'],
+      '1D': ['1E', '1F', '1G', '2A'],
+      '2A': ['2B', '2C', '2D', '2E'],
+      '2E': ['2F', '2G', '3A', '3B'],
     },
   },
   {
     number: 2,
     color: '#f3722c',
     strings: {
-      G: ['B', 'C', 'D', 'E'],
-      D: ['F', 'G', 'A', 'B'],
-      A: ['C', 'D', 'E', 'F'],
-      E: ['G', 'A', 'B', 'C'],
+      '0G': ['1B', '1C', '1D', '1E'],
+      '1D': ['1F', '1G', '2A', '2B'],
+      '2A': ['2C', '2D', '2E', '2F'],
+      '2E': ['2G', '3A', '3B', '3C'],
     },
   },
   {
     number: 3,
     color: '#f8961e',
     strings: {
-      G: ['C', 'D', 'E', 'F'],
-      D: ['G', 'A', 'B', 'C'],
-      A: ['D', 'E', 'F', 'G'],
-      E: ['A', 'B', 'C', 'D'],
+      '0G': ['1C', '1D', '1E', '1F'],
+      '1D': ['1G', '2A', '2B', '2C'],
+      '2A': ['2D', '2E', '2F', '2G'],
+      '2E': ['3A', '3B', '3C', '3D'],
     },
   },
   {
     number: 4,
     color: '#f9c74f',
     strings: {
-      G: ['D', 'E', 'F', '2G'],
-      D: ['A', 'B', 'C', '2D'],
-      A: ['E', 'F', 'G', '2A'],
-      E: ['B', 'C', 'D', '2E'],
+      '0G': ['1D', '1E', '1F', '1G'],
+      '1D': ['2A', '2B', '2C', '2D'],
+      '2A': ['2E', '2F', '2G', '3A'],
+      '2E': ['3B', '3C', '3D', '3E'],
     },
   },
   {
     number: 5,
     color: '#90be6d',
     strings: {
-      G: ['E', 'F', '2G', '2A'],
-      D: ['B', 'C', '2D', '2E'],
-      A: ['F', 'G', '2A', '2B'],
-      E: ['C', 'D', '2E', '2F'],
+      '0G': ['1E', '1F', '1G', '2A'],
+      '1D': ['2B', '2C', '2D', '2E'],
+      '2A': ['2F', '2G', '3A', '3B'],
+      '2E': ['3C', '3D', '3E', '3F'],
     },
   },
   {
     number: 6,
     color: '#43aa8b',
     strings: {
-      G: ['F', '2G', '2A', '2B'],
-      D: ['C', '2D', '2E', '2F'],
-      A: ['G', '2A', '2B', '2C'],
-      E: ['D', '2E', '2F', '2G'],
+      '0G': ['1F', '1G', '2A', '2B'],
+      '1D': ['2C', '2D', '2E', '2F'],
+      '2A': ['2G', '3A', '3B', '3C'],
+      '2E': ['3D', '3E', '3F', '3G'],
     },
   },
   {
     number: 7,
     color: '#577590',
     strings: {
-      G: ['2G', '2A', '2B', '2C'],
-      D: ['2D', '2E', '2F', '2G'],
-      A: ['2A', '2B', '2C', '2D'],
-      E: ['2E', '2F', '2G', '2A'],
+      '0G': ['1G', '2A', '2B', '2C'],
+      '1D': ['2D', '2E', '2F', '2G'],
+      '2A': ['3A', '3B', '3C', '3D'],
+      '2E': ['3E', '3F', '3G', '4A'],
     },
   },
 ];

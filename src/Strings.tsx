@@ -14,9 +14,9 @@ import {
 } from './getNotes';
 
 type StringsProps = {
-  strings: [Note, OctaveNote][];
+  strings: [OctaveNote, OctaveNote][];
   isFrench: boolean;
-  onSelectString: (string: Note) => void;
+  onSelectString: (string: OctaveNote) => void;
 };
 
 export function Strings({ strings, isFrench, onSelectString }: StringsProps) {
@@ -24,10 +24,7 @@ export function Strings({ strings, isFrench, onSelectString }: StringsProps) {
     <>
       {strings.map((notes, tonicIndex) => {
         const [tonic, ...notesWithOctave] = getNotesWithOctave(notes);
-
-        if (!isNote(tonic)) {
-          throw new Error(`the tonic ${tonic} contains an octave`);
-        }
+        const tonicWithoutOctave = isNote(tonic) ? tonic : (tonic[1] as Note);
 
         return (
           <g id={`${tonic}-string`} key={tonic}>
@@ -51,7 +48,7 @@ export function Strings({ strings, isFrench, onSelectString }: StringsProps) {
                 textAnchor="middle"
                 fill="black"
               >
-                {isFrench ? noteToFrench[tonic] : tonic}
+                {isFrench ? noteToFrench[tonicWithoutOctave] : tonicWithoutOctave}
               </text>
             </g>
 

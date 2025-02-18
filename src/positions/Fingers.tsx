@@ -1,11 +1,11 @@
 import { FIRST_NOTE_OFFSET, NOTE_SPACING } from '../drawing.const';
-import { getToneCountFromTonic, Note, OctaveNote } from '../getNotes';
+import { getToneCountFromTonic, OctaveNote } from '../getNotes';
 import { type Position } from '../violin.model';
 import { getFingerXPosition } from './positions.helpers';
 
 type FingersProps = {
-  tonic: Note;
-  notes: (Note | OctaveNote)[];
+  tonic: OctaveNote;
+  notes: OctaveNote[];
   selectedPositions: Position[];
   position: Position;
 };

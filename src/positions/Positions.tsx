@@ -5,7 +5,7 @@ import {
   START_STRING_OFFSET,
   STRING_SPACING,
 } from '../drawing.const';
-import { getMinMaxTonesCountFromTonics, Note, OctaveNote } from '../getNotes';
+import { getMinMaxTonesCountFromTonics, OctaveNote } from '../getNotes';
 import { type Position } from '../violin.model';
 import { Fingers } from './Fingers';
 import { getOddXPosition, getPositionWidth } from './positions.helpers';
@@ -13,7 +13,7 @@ import { getOddXPosition, getPositionWidth } from './positions.helpers';
 type PositionsProps = {
   positions: Position[];
   selectedPositions: Position[];
-  selectedString?: Note;
+  selectedString?: OctaveNote;
 };
 
 export function Positions({ positions, selectedPositions, selectedString }: PositionsProps) {
@@ -32,9 +32,9 @@ export function Positions({ positions, selectedPositions, selectedString }: Posi
         const baseKeyString = selectedString
           ? selectedString
           : positionIndex % 2 === 0
-          ? (Object.keys(strings)[0] as Note)
-          : (Object.keys(strings)[Object.keys(strings).length - 1] as Note);
-        const baseStringNotes = strings[baseKeyString] as (Note | OctaveNote)[];
+          ? (Object.keys(strings)[0] as OctaveNote)
+          : (Object.keys(strings)[Object.keys(strings).length - 1] as OctaveNote);
+        const baseStringNotes = strings[baseKeyString] as OctaveNote[];
 
         return (
           <g id={`position-${number}`} key={`position-${number}`}>

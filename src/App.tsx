@@ -1,15 +1,15 @@
 import { useEffect, useState } from 'react';
 
 import { Configuration } from './Configuration';
-import { type Note } from './getNotes';
 import { Positions } from './positions/Positions';
 import { Strings } from './Strings';
-import { type Position, POSITIONS, VIOLON_STRINGS } from './violin.model';
 import { Violin } from './Violin';
+import { POSITIONS, VIOLON_STRINGS } from './violin.model';
+import { OctaveNote } from './getNotes';
 
 function App() {
-  const [selectedPositions, setSelectedPosition] = useState<Position[]>([]);
-  const [selectedString, setSelectedString] = useState<Note | undefined>();
+  const [selectedPositions, setSelectedPosition] = useState<(typeof POSITIONS)[number][]>([]);
+  const [selectedString, setSelectedString] = useState<OctaveNote | undefined>();
   const [isFrench, setIsFrench] = useState(false);
 
   const togglePosition = (position: number) => {
