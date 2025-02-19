@@ -4,19 +4,26 @@ import { Configuration } from './Configuration';
 import { Positions } from './positions/Positions';
 import { Strings } from './Strings';
 import { Violin } from './Violin';
-import { POSITIONS, VIOLON_STRINGS } from './violin.model';
+import { type Position, POSITIONS, VIOLON_STRINGS } from './violin.model';
 import { OctaveNote } from './getNotes';
 
 function App() {
-  const [selectedPositions, setSelectedPosition] = useState<(typeof POSITIONS)[number][]>([]);
+  const [selectedPositions, setSelectedPosition] = useState<Position[]>([]);
   const [selectedString, setSelectedString] = useState<OctaveNote | undefined>();
+  const [selectedNote, setSelectedNote] = useState<OctaveNote | undefined>();
   const [isFrench, setIsFrench] = useState(false);
 
   const togglePosition = (position: number) => {
     if (selectedPositions.find((selectedPosition) => selectedPosition.number === position)) {
-      setSelectedPosition(
-        selectedPositions.filter((selectedPosition) => selectedPosition.number !== position)
+      const newPositions = selectedPositions.filter(
+        (selectedPosition) => selectedPosition.number !== position
       );
+      setSelectedPosition(newPositions);
+
+      if (newPositions.length === 0) {
+        setSelectedNote(undefined);
+      }
+
       return;
     }
 
@@ -27,6 +34,28 @@ function App() {
     if (positionToAdd !== undefined) {
       setSelectedPosition([...selectedPositions, positionToAdd]);
     }
+  };
+
+  const handleSelectNote = (note: OctaveNote) => {
+    if (note === selectedNote) {
+      setSelectedNote(undefined);
+      setSelectedPosition([]);
+      return;
+    }
+
+    setSelectedNote(note);
+
+    const includingPosition: Position[] = [];
+
+    for (const position of POSITIONS) {
+      const notes = new Set(Object.values(position.strings).flat());
+
+      if (notes.has(note)) {
+        includingPosition.push(position);
+      }
+    }
+
+    setSelectedPosition(includingPosition);
   };
 
   useEffect(() => {
@@ -56,7 +85,9 @@ function App() {
         <Strings
           strings={[...VIOLON_STRINGS.values()]}
           isFrench={isFrench}
+          selectedNote={selectedNote}
           onSelectString={setSelectedString}
+          onSelectNote={handleSelectNote}
         />
       </svg>
     </div>

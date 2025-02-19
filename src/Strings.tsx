@@ -16,10 +16,18 @@ import {
 type StringsProps = {
   strings: [OctaveNote, OctaveNote][];
   isFrench: boolean;
+  selectedNote?: OctaveNote;
   onSelectString: (string: OctaveNote) => void;
+  onSelectNote: (string: OctaveNote) => void;
 };
 
-export function Strings({ strings, isFrench, onSelectString }: StringsProps) {
+export function Strings({
+  strings,
+  isFrench,
+  selectedNote,
+  onSelectString,
+  onSelectNote,
+}: StringsProps) {
   return (
     <>
       {strings.map((notes, tonicIndex) => {
@@ -37,7 +45,7 @@ export function Strings({ strings, isFrench, onSelectString }: StringsProps) {
                 cx={(tonicIndex + 1) * STRING_SPACING + START_STRING_OFFSET}
                 cy={STRING_SPACING}
                 r="20"
-                fill="white"
+                fill={selectedNote === tonic ? '#686e6c' : 'white'}
                 stroke="black"
                 strokeWidth="1"
               />
@@ -46,7 +54,7 @@ export function Strings({ strings, isFrench, onSelectString }: StringsProps) {
                 y="58"
                 fontSize="22"
                 textAnchor="middle"
-                fill="black"
+                fill={selectedNote === tonic ? 'white' : 'black'}
               >
                 {isFrench ? noteToFrench[tonicWithoutOctave] : tonicWithoutOctave}
               </text>
@@ -66,12 +74,17 @@ export function Strings({ strings, isFrench, onSelectString }: StringsProps) {
               const tonesFromTonic = getToneCountFromTonic(tonic, note);
 
               return (
-                <g id={`${note}-note-${tonic}-string`} key={`${tonic}-${noteIndex}`}>
+                <g
+                  id={`${note}-note-${tonic}-string`}
+                  key={`${tonic}-${noteIndex}`}
+                  onClick={() => onSelectNote(note)}
+                  className="cursor-pointer"
+                >
                   <circle
                     cx={(tonicIndex + 1) * STRING_SPACING + START_STRING_OFFSET}
                     cy={tonesFromTonic * NOTE_SPACING + FIRST_NOTE_OFFSET}
                     r="20"
-                    fill="white"
+                    fill={selectedNote === note ? '#686e6c' : 'white'}
                     stroke="black"
                     strokeWidth="1"
                   />
@@ -81,7 +94,7 @@ export function Strings({ strings, isFrench, onSelectString }: StringsProps) {
                     y={tonesFromTonic * NOTE_SPACING + FIRST_NOTE_OFFSET + 8}
                     fontSize="22"
                     textAnchor="middle"
-                    fill="black"
+                    fill={selectedNote === note ? 'white' : 'black'}
                   >
                     {isFrench ? noteToFrench[noteWithoutOctave] : noteWithoutOctave}
                   </text>

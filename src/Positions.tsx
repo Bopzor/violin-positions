@@ -6,11 +6,11 @@ import {
   STRING_SPACING,
 } from './drawing.const';
 import { getMinMaxTonesCountFromTonics, getToneCountFromTonic, OctaveNote } from './getNotes';
-import { POSITIONS } from './violin.model';
+import { type Position } from './violin.model';
 
 type PositionsProps = {
-  positions: (typeof POSITIONS)[number][];
-  selectedPositions: (typeof POSITIONS)[number][];
+  positions: Position[];
+  selectedPositions: Position[];
   selectedString?: OctaveNote;
 };
 

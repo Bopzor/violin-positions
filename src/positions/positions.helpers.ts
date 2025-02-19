@@ -6,9 +6,9 @@ export const getPositionRatio = (position: Position, selectedPositions: Position
     ({ number }) => number % 2 === position.number % 2
   );
 
-  const currentPositionNote = position.strings.G!.flat();
+  const currentPositionNote = position.strings['0G']!.flat();
   const allGStringNotes = sameSidePositions
-    .map(({ strings }) => strings.G)
+    .map(({ strings }) => strings['0G'])
     .flat()
     .filter((note) => currentPositionNote.includes(note!));
   const isOverlapping = [...new Set(allGStringNotes)].length < allGStringNotes.length;
