@@ -83,3 +83,5 @@ export const POSITIONS: {
     },
   },
 ];
+
+export type Position = (typeof POSITIONS)[number];

@@ -2,13 +2,13 @@ import { useEffect, useState } from 'react';
 
 import { Configuration } from './Configuration';
 import { type Note } from './getNotes';
-import { Positions } from './Positions';
+import { Positions } from './positions/Positions';
 import { Strings } from './Strings';
-import { POSITIONS, VIOLON_STRINGS } from './violin.model';
+import { type Position, POSITIONS, VIOLON_STRINGS } from './violin.model';
 import { Violin } from './Violin';
 
 function App() {
-  const [selectedPositions, setSelectedPosition] = useState<(typeof POSITIONS)[number][]>([]);
+  const [selectedPositions, setSelectedPosition] = useState<Position[]>([]);
   const [selectedString, setSelectedString] = useState<Note | undefined>();
   const [isFrench, setIsFrench] = useState(false);
 
