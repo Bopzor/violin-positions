@@ -2,7 +2,7 @@ import { POSITIONS } from './violin.model';
 
 type ConfigurationProps = {
   togglePosition: (position: number) => void;
-  selectedPositions: (typeof POSITIONS)[number][];
+  selectedPositions: Position[];
   isFrench: boolean;
   toggleLanguageNotation: (isFrench: boolean) => void;
 };
